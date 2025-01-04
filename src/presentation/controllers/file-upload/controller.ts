@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { CustomError, LoginUserDto, RegisterUserDto } from "../../domain";
-import { UploadFileService } from "../services";
+import { CustomError, LoginUserDto, RegisterUserDto } from "../../../domain";
+import { UploadFileService } from "../../services";
 import { UploadedFile } from "express-fileupload";
 
 export class UploadFileController {
