@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { CreateServiceDto, CustomError } from "../../../domain";
+import {
+  CreateServiceDto,
+  CustomError,
+  UpdateServiceDto,
+} from "../../../domain";
 import { ServicesService } from "../../services";
 
 export class ServicesController {
@@ -14,26 +18,38 @@ export class ServicesController {
     return res.status(500).json({ error: "Internal Server Error" });
   };
 
-  createService = (req: Request, res: Response) => {
+  create = (req: Request, res: Response) => {
     const [error, createServiceDto] = CreateServiceDto.create(req.body);
     if (error) return res.status(400).json({ error });
+
     this.servicesService
-      .createService(createServiceDto!)
+      .create(createServiceDto!)
       .then((service) => res.status(201).json(service))
       .catch((error) => this.handleError(error, res));
   };
 
-  getServices = (req: Request, res: Response) => {
+  update = (req: Request, res: Response) => {
+    const id = req.params.id;
+    const [error, updateServiceDto] = UpdateServiceDto.create(req.body);
+    if (error) return res.status(400).json({ error });
+
     this.servicesService
-      .getServices()
+      .update(id, updateServiceDto!)
+      .then((service) => res.status(201).json(service))
+      .catch((error) => this.handleError(error, res));
+  };
+
+  findAll = (req: Request, res: Response) => {
+    this.servicesService
+      .findAll()
       .then((services) => res.json(services))
       .catch((error) => this.handleError(error, res));
   };
 
-  getService = (req: Request, res: Response) => {
+  findOne = (req: Request, res: Response) => {
     const id = req.params.id;
     this.servicesService
-      .getService(id)
+      .findOne(id)
       .then((services) => res.json(services))
       .catch((error) => this.handleError(error, res));
   };

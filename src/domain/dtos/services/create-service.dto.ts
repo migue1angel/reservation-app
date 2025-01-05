@@ -25,11 +25,17 @@ export class CreateServiceDto {
     if (!name) return ["Missing name"];
     if (!description) return ["Missing description"];
     if (!duration) return ["Missing duration"];
-    if (!availability) return ["Missing available timetable"];
+    if (!availability) return ["Missing availability"];
+    if (availability.length === 0) return ["At least one availability is required"];
     if (!pricePerPerson) return ["Missing price per person"];
     if (!maxCapacity) return ["Missing max capacity"];
     if (!minCapacity) return ["Missing min capacity"];
     if (!category) return ["Missing category"];
+
+    availability.forEach((availability: CreateAvailabilityDto) => {
+      const [error, _] = CreateAvailabilityDto.create(availability);
+      if (error) throw new Error (error);
+    })
 
     return [
       undefined,
@@ -47,6 +53,27 @@ export class CreateServiceDto {
   }
 }
 
+class CreateAvailabilityDto {
+  constructor(
+    public readonly day: string,
+    public readonly slots: CreateTimeSlotDto[]
+  ) {}
+  static create(object: { 
+    [key: string]: any;
+  }): [string?, CreateAvailabilityDto?] {
+    console.log(object);
+    
+    const { day, slots } = object;
+    if (!day) return ["Missing day of availability"];
+    if (!slots) return ["Missing slots of availability"];
+    slots.forEach((slot:CreateTimeSlotDto) => {
+      const [error, _] = CreateTimeSlotDto.create(slot);
+      if (error) throw new Error(error); 
+    })
+    return [undefined, new CreateAvailabilityDto(day, slots)];
+  }
+}
+
 class CreateTimeSlotDto {
   constructor(
     public readonly start_time: Date,
@@ -60,32 +87,50 @@ class CreateTimeSlotDto {
   }
 }
 
-class CreateAvailabilityDto {
+export class UpdateServiceDto {
   constructor(
-    public readonly monday?: CreateTimeSlotDto[],
-    public readonly tuesday?: CreateTimeSlotDto[],
-    public readonly wednesday?: CreateTimeSlotDto[],
-    public readonly thursday?: CreateTimeSlotDto[],
-    public readonly friday?: CreateTimeSlotDto[],
-    public readonly saturday?: CreateTimeSlotDto[],
-    public readonly sunday?: CreateTimeSlotDto[]
+    public readonly name?: string,
+    public readonly description?: string,
+    public readonly duration?: number,
+    public readonly availability?: CreateAvailabilityDto[],
+    public readonly pricePerPerson?: number,
+    public readonly maxCapacity?: number,
+    public readonly minCapacity?: number,
+    public readonly category?: string
   ) {}
-  static create(object: {
-    [key: string]: any;
-  }): [string?, CreateAvailabilityDto?] {
-    const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } =
-      object;
+
+  static create(object: { [key: string]: any }): [string?, UpdateServiceDto?] {
+    const {
+      name,
+      description,
+      duration,
+      availability,
+      pricePerPerson,
+      maxCapacity,
+      minCapacity,
+      category,
+    } = object;
+
+    if (availability && availability.length > 0) {
+      availability.forEach((availability: CreateAvailabilityDto) => {
+        const [error, _] = CreateAvailabilityDto.create(availability);
+        if (error) throw new Error(error);
+      });
+    }
+
     return [
       undefined,
-      new CreateAvailabilityDto(
-        monday,
-        tuesday,
-        wednesday,
-        thursday,
-        friday,
-        saturday,
-        sunday
+      new UpdateServiceDto(
+        name,
+        description,
+        duration,
+        availability,
+        pricePerPerson,
+        maxCapacity,
+        minCapacity,
+        category
       ),
     ];
   }
 }
+
