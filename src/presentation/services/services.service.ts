@@ -13,6 +13,7 @@ export class ServicesService {
   ) {
     const { page, limit } = paginationDto;
 
+
     if (category) {
       const services = await ServiceModel.find({ category: category })
         .skip((page - 1) * limit)
@@ -23,7 +24,9 @@ export class ServicesService {
     }
 
     if (name) {
-      const services = await ServiceModel.find({ name: { $regex: name } });
+      const services = await ServiceModel.find({
+        name: { $regex: new RegExp(name, "i") },
+      });
       return services;
     }
 
@@ -45,17 +48,17 @@ export class ServicesService {
   }
 
   async findOne(id: string) {
-    const reservation = await ServiceModel.findOne({
+    const service = await ServiceModel.findOne({
       _id: id,
     }).populate("category");
-    return reservation;
+    return service;
   }
 
   async findOneByName(name: string) {
-    const reservation = await ServiceModel.findOne({
+    const service = await ServiceModel.findOne({
       name,
     });
-    return reservation;
+    return service;
   }
 
   async create(createServiceDto: CreateServiceDto) {
@@ -76,6 +79,18 @@ export class ServicesService {
       updateServiceDto,
       { new: true }
     );
+    return updatedService;
+  }
+
+  async changeStatus(id: string) {
+    let updatedService = await ServiceModel.findById(id);
+
+    if (!updatedService) throw CustomError.notFound("Service not found");
+
+    if (updatedService.status === "active") updatedService.status = "inactive";
+    else updatedService.status = "active";
+
+    await updatedService.save();
     return updatedService;
   }
 

@@ -7,7 +7,9 @@ export class CreateServiceDto {
     public readonly pricePerPerson: number,
     public readonly maxCapacity: number,
     public readonly minCapacity: number,
-    public readonly category: string
+    public readonly category: string,
+    public readonly requirements?: string[],
+    public readonly unavailableDates?: Date[]
   ) {}
 
   static create(object: { [key: string]: any }): [string?, CreateServiceDto?] {
@@ -20,13 +22,16 @@ export class CreateServiceDto {
       maxCapacity,
       minCapacity,
       category,
+      requirements,
+      unavailableDates,
     } = object;
 
     if (!name) return ["Missing name"];
     if (!description) return ["Missing description"];
     if (!duration) return ["Missing duration"];
     if (!availability) return ["Missing availability"];
-    if (availability.length === 0) return ["At least one availability is required"];
+    if (availability.length === 0)
+      return ["At least one availability is required"];
     if (!pricePerPerson) return ["Missing price per person"];
     if (!maxCapacity) return ["Missing max capacity"];
     if (!minCapacity) return ["Missing min capacity"];
@@ -34,8 +39,8 @@ export class CreateServiceDto {
 
     availability.forEach((availability: CreateAvailabilityDto) => {
       const [error, _] = CreateAvailabilityDto.create(availability);
-      if (error) throw new Error (error);
-    })
+      if (error) throw new Error(error);
+    });
 
     return [
       undefined,
@@ -47,7 +52,9 @@ export class CreateServiceDto {
         pricePerPerson,
         maxCapacity,
         minCapacity,
-        category
+        category,
+        requirements,
+        unavailableDates
       ),
     ];
   }
@@ -58,18 +65,17 @@ class CreateAvailabilityDto {
     public readonly day: string,
     public readonly slots: CreateTimeSlotDto[]
   ) {}
-  static create(object: { 
+  static create(object: {
     [key: string]: any;
   }): [string?, CreateAvailabilityDto?] {
-    console.log(object);
-    
+
     const { day, slots } = object;
     if (!day) return ["Missing day of availability"];
     if (!slots) return ["Missing slots of availability"];
-    slots.forEach((slot:CreateTimeSlotDto) => {
+    slots.forEach((slot: CreateTimeSlotDto) => {
       const [error, _] = CreateTimeSlotDto.create(slot);
-      if (error) throw new Error(error); 
-    })
+      if (error) throw new Error(error);
+    });
     return [undefined, new CreateAvailabilityDto(day, slots)];
   }
 }
@@ -96,7 +102,8 @@ export class UpdateServiceDto {
     public readonly pricePerPerson?: number,
     public readonly maxCapacity?: number,
     public readonly minCapacity?: number,
-    public readonly category?: string
+    public readonly category?: string,
+    public readonly unavailableDates?: Date[]
   ) {}
 
   static create(object: { [key: string]: any }): [string?, UpdateServiceDto?] {
@@ -109,6 +116,7 @@ export class UpdateServiceDto {
       maxCapacity,
       minCapacity,
       category,
+      unavailableDates,
     } = object;
 
     if (availability && availability.length > 0) {
@@ -128,9 +136,9 @@ export class UpdateServiceDto {
         pricePerPerson,
         maxCapacity,
         minCapacity,
-        category
+        category,
+        unavailableDates
       ),
     ];
   }
 }
-

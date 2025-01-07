@@ -21,7 +21,6 @@ export class ServicesController {
   };
 
   create = (req: Request, res: Response) => {
-    console.log(req.body);
 
     const [error, createServiceDto] = CreateServiceDto.create(req.body);
     if (error) return res.status(400).json({ error });
@@ -67,6 +66,14 @@ export class ServicesController {
     this.servicesService
       .delete(id)
       .then((services) => res.json(services))
+      .catch((error) => this.handleError(error, res));
+  };
+
+  changeStatus = (req: Request, res: Response) => {
+    const id = req.params.id;
+    this.servicesService
+      .changeStatus(id)
+      .then((service) => res.json(service))
       .catch((error) => this.handleError(error, res));
   };
 }
