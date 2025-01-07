@@ -1,12 +1,10 @@
 import { UploadedFile } from "express-fileupload";
-import path, { dirname } from "path";
+import path from "path";
 import fs from "fs";
 import { CustomError } from "../../domain";
 import { UuidAdapter } from "../../config/uuid.adapter";
 
 export class UploadFileService {
-  constructor() {}
-
   private checkFolder(folderPath: string) {
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath);
@@ -18,7 +16,6 @@ export class UploadFileService {
     folder: string = "uploads",
     validExtensions: string[] = ["png", "jpg", "jpeg"]
   ) {
-    
     try {
       const fileExtension = file.mimetype.split("/").at(1) ?? "";
 
@@ -43,7 +40,9 @@ export class UploadFileService {
     validExtensions: string[] = ["png", "jpg", "jpeg", "pdf"]
   ) {
     const fileNames = await Promise.all(
-      files.map((file) => this.uploadSingle(file, folder, validExtensions))
+      files.map((file) => {
+        return this.uploadSingle(file, folder, validExtensions);
+      })
     );
 
     return fileNames;

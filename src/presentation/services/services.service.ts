@@ -1,11 +1,47 @@
 import { ServiceModel } from "../../database";
-import { CreateServiceDto, CustomError, UpdateServiceDto } from "../../domain";
+import {
+  CreateServiceDto,
+  CustomError,
+  PaginationDto,
+  UpdateServiceDto,
+} from "../../domain";
 export class ServicesService {
-  constructor() {}
+  async findAll(
+    paginationDto: PaginationDto,
+    category?: string,
+    name?: string
+  ) {
+    const { page, limit } = paginationDto;
 
-  async findAll() {
-    const reservations = await ServiceModel.find();
-    return reservations;
+    if (category) {
+      const services = await ServiceModel.find({ category: category })
+        .skip((page - 1) * limit)
+        .limit(limit)
+
+        .populate("category");
+      return services;
+    }
+
+    if (name) {
+      const services = await ServiceModel.find({ name: { $regex: name } });
+      return services;
+    }
+
+    const [total, services] = await Promise.all([
+      ServiceModel.countDocuments(),
+      ServiceModel.find()
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .populate("category"),
+    ]);
+    const totalPages = Math.ceil(total / limit);
+    return {
+      page,
+      limit,
+      total,
+      totalPages,
+      services,
+    };
   }
 
   async findOne(id: string) {
@@ -34,13 +70,17 @@ export class ServicesService {
       throw CustomError.internalServer(`${err}`);
     }
   }
-// todo:update
   async update(id: string, updateServiceDto: UpdateServiceDto) {
-    const updatedService = await this.findOne(id);
-    if (!updatedService) throw new Error("Service not found");
-    if (updatedService.availability.length > 0 && updateServiceDto.availability) {
-      // updatedService.availability = updateServiceDto.availability;
-    }
+    const updatedService = await ServiceModel.findByIdAndUpdate(
+      id,
+      updateServiceDto,
+      { new: true }
+    );
     return updatedService;
+  }
+
+  async delete(id: string) {
+    const deletedService = await ServiceModel.findByIdAndDelete(id);
+    return deletedService;
   }
 }

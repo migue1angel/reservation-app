@@ -24,4 +24,14 @@ export class UploadFileController {
       .then((file) => res.status(201).json(file))
       .catch((error) => this.handleError(error, res));
   };
+
+  uploadMultiple = (req: Request, res: Response) => {
+    const type = req.params.type;
+    const files = req.body.files;
+
+    this.uploadFileService
+      .uploadMultiple(files, `uploads/${type}`)
+      .then((file) => res.status(201).json(file))
+      .catch((error) => this.handleError(error, res));
+  };
 }

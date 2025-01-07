@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import {
   CreateServiceDto,
   CustomError,
+  PaginationDto,
   UpdateServiceDto,
 } from "../../../domain";
 import { ServicesService } from "../../services";
+import { FindOptionsDto } from "../../../domain/dtos/shared/find-options.dto";
 
 export class ServicesController {
   constructor(public readonly servicesService: ServicesService) {}
@@ -19,6 +21,8 @@ export class ServicesController {
   };
 
   create = (req: Request, res: Response) => {
+    console.log(req.body);
+
     const [error, createServiceDto] = CreateServiceDto.create(req.body);
     if (error) return res.status(400).json({ error });
 
@@ -40,8 +44,12 @@ export class ServicesController {
   };
 
   findAll = (req: Request, res: Response) => {
+    const { page = 1, limit = 10, category = "", name = "" } = req.query;
+
+    const [error, paginationDto] = PaginationDto.create(+page, +limit);
+    if (error) return res.status(400).json({ error });
     this.servicesService
-      .findAll()
+      .findAll(paginationDto!, category.toString(), name.toString())
       .then((services) => res.json(services))
       .catch((error) => this.handleError(error, res));
   };
@@ -50,6 +58,14 @@ export class ServicesController {
     const id = req.params.id;
     this.servicesService
       .findOne(id)
+      .then((services) => res.json(services))
+      .catch((error) => this.handleError(error, res));
+  };
+
+  delete = (req: Request, res: Response) => {
+    const id = req.params.id;
+    this.servicesService
+      .delete(id)
       .then((services) => res.json(services))
       .catch((error) => this.handleError(error, res));
   };
