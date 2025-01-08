@@ -63,35 +63,21 @@ export class CreateServiceDto {
 class CreateAvailabilityDto {
   constructor(
     public readonly day: string,
-    public readonly slots: CreateTimeSlotDto[]
+    public readonly startTime: string,
+    public readonly endTime: string
   ) {}
   static create(object: {
     [key: string]: any;
   }): [string?, CreateAvailabilityDto?] {
-
-    const { day, slots } = object;
+    const { day, startTime, endTime } = object;
     if (!day) return ["Missing day of availability"];
-    if (!slots) return ["Missing slots of availability"];
-    slots.forEach((slot: CreateTimeSlotDto) => {
-      const [error, _] = CreateTimeSlotDto.create(slot);
-      if (error) throw new Error(error);
-    });
-    return [undefined, new CreateAvailabilityDto(day, slots)];
+    if (!startTime) return ["Missing startTime of availability"];
+    if (!endTime) return ["Missing endTime of availability"];
+
+    return [undefined, new CreateAvailabilityDto(day, startTime, endTime)];
   }
 }
 
-class CreateTimeSlotDto {
-  constructor(
-    public readonly start_time: Date,
-    public readonly end_time: Date
-  ) {}
-  static create(object: { [key: string]: any }): [string?, CreateTimeSlotDto?] {
-    const { startTime, endTime } = object;
-    if (!startTime) return ["Missing start time"];
-    if (!endTime) return ["Missing end time"];
-    return [undefined, new CreateTimeSlotDto(startTime, endTime)];
-  }
-}
 
 export class UpdateServiceDto {
   constructor(
