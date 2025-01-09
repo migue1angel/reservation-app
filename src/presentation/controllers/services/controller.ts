@@ -6,7 +6,6 @@ import {
   UpdateServiceDto,
 } from "../../../domain";
 import { ServicesService } from "../../services";
-import { FindOptionsDto } from "../../../domain/dtos/shared/find-options.dto";
 
 export class ServicesController {
   constructor(public readonly servicesService: ServicesService) {}

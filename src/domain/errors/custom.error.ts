@@ -51,6 +51,7 @@ export class CustomError extends Error {
    * @returns Un objeto CustomError con el código de estado 404.
    */
   static notFound(message: string) {
+    
     return new CustomError(404, message);
   }
 

@@ -8,6 +8,7 @@ export class CreateServiceDto {
     public readonly maxCapacity: number,
     public readonly minCapacity: number,
     public readonly category: string,
+    public readonly remainingReservations: number,
     public readonly requirements?: string[],
     public readonly unavailableDates?: Date[]
   ) {}
@@ -22,6 +23,7 @@ export class CreateServiceDto {
       maxCapacity,
       minCapacity,
       category,
+      remainingReservations,
       requirements,
       unavailableDates,
     } = object;
@@ -36,6 +38,7 @@ export class CreateServiceDto {
     if (!maxCapacity) return ["Missing max capacity"];
     if (!minCapacity) return ["Missing min capacity"];
     if (!category) return ["Missing category"];
+    if (!remainingReservations) return ["Missing remaining reservations"];
 
     availability.forEach((availability: CreateAvailabilityDto) => {
       const [error, _] = CreateAvailabilityDto.create(availability);
@@ -53,6 +56,7 @@ export class CreateServiceDto {
         maxCapacity,
         minCapacity,
         category,
+        remainingReservations,
         requirements,
         unavailableDates
       ),
@@ -77,7 +81,6 @@ class CreateAvailabilityDto {
     return [undefined, new CreateAvailabilityDto(day, startTime, endTime)];
   }
 }
-
 
 export class UpdateServiceDto {
   constructor(

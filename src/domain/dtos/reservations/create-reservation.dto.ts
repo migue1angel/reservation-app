@@ -1,13 +1,8 @@
-interface SlotDto {
-  day: string;
-  startTime: string;
-  endTime: string;
-}
 export class CreateReservationDto {
   constructor(
     public readonly service: string,
     public readonly date: Date,
-    public readonly slot: SlotDto,
+    public readonly slot: CreateSlotDto,
     public readonly user: string,
     public readonly numberParticipants: number
   ) {}

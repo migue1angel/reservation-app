@@ -1,5 +1,21 @@
 services:
 
+  # reservation-back-app:
+  #   container_name: reservation-back
+  #   build: .
+  #   volumes:
+  #     - ./src:/app/src
+  #     - ./tsconfig.json:/app/tsconfig.json
+  #   ports:
+  #     - 3000:3000
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+  #   depends_on:
+  #     - mongo-db
+    
+
   mongo-db:
     image: mongo:7.0.14
     # restart: always
@@ -10,3 +26,4 @@ services:
       - ./mongo:/data/db
     ports:
       - 27017:27017
+
